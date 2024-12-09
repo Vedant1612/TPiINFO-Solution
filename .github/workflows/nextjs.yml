@@ -20,17 +20,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Set working directory to TPiINFO
+        run: cd TPiINFO
       - name: Detect package manager
         id: detect-package-manager
         run: |
-          # Check if yarn.lock exists in the correct directory
-          if [ -f "TPiINFO-Solution/TPiINFO/yarn.lock" ]; then
+          # Check if yarn.lock exists in the TPiINFO directory
+          if [ -f "TPiINFO/yarn.lock" ]; then
             echo "manager=yarn" >> $GITHUB_OUTPUT
             echo "command=install" >> $GITHUB_OUTPUT
             echo "runner=yarn" >> $GITHUB_OUTPUT
             exit 0
-          # Check if package.json exists in the correct directory
-          elif [ -f "TPiINFO-Solution/TPiINFO/package.json" ]; then
+          # Check if package.json exists in the TPiINFO directory
+          elif [ -f "TPiINFO/package.json" ]; then
             echo "manager=npm" >> $GITHUB_OUTPUT
             echo "command=ci" >> $GITHUB_OUTPUT
             echo "runner=npx --no-install" >> $GITHUB_OUTPUT
@@ -52,10 +54,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            TPiINFO-Solution/TPiINFO/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('TPiINFO-Solution/TPiINFO/package-lock.json', 'TPiINFO-Solution/TPiINFO/yarn.lock') }}-${{ hashFiles('TPiINFO-Solution/TPiINFO/**.[jt]s', 'TPiINFO-Solution/TPiINFO/**.[jt]sx') }}
+            TPiINFO/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('TPiINFO/package-lock.json', 'TPiINFO/yarn.lock') }}-${{ hashFiles('TPiINFO/**.[jt]s', 'TPiINFO/**.[jt]sx') }}
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('TPiINFO-Solution/TPiINFO/package-lock.json', 'TPiINFO-Solution/TPiINFO/yarn.lock') }}-
+            ${{ runner.os }}-nextjs-${{ hashFiles('TPiINFO/package-lock.json', 'TPiINFO/yarn.lock') }}-
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
       - name: Build with Next.js
@@ -63,7 +65,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: TPiINFO-Solution/TPiINFO/out
+          path: TPiINFO/out
 
   deploy:
     environment:
